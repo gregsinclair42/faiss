@@ -1154,12 +1154,12 @@ SQDistanceComputer* select_distance_computer(
  ********************************************************************/
 
 ScalarQuantizer::ScalarQuantizer(size_t d, QuantizerType qtype)
-        : Quantizer(d), qtype(qtype), rangestat(RS_minmax), rangestat_arg(0) {
+        : Quantizer(d), qtype(qtype), rangestat(RS_minmax), rangestat_arg(0), n_training_value(0) {
     set_derived_sizes();
 }
 
 ScalarQuantizer::ScalarQuantizer()
-        : qtype(QT_8bit), rangestat(RS_minmax), rangestat_arg(0), bits(0) {}
+        : qtype(QT_8bit), rangestat(RS_minmax), rangestat_arg(0), bits(0), n_training_value(0) {}
 
 void ScalarQuantizer::set_derived_sizes() {
     switch (qtype) {
@@ -1186,6 +1186,7 @@ void ScalarQuantizer::set_derived_sizes() {
 }
 
 void ScalarQuantizer::train(size_t n, const float* x) {
+    n_training_value = n;
     int bit_per_dim = qtype == QT_4bit_uniform ? 4
             : qtype == QT_4bit                 ? 4
             : qtype == QT_6bit                 ? 6
@@ -1230,6 +1231,8 @@ void ScalarQuantizer::train_residual(
         bool by_residual,
         bool verbose) {
     const float* x_in = x;
+
+    n_training_value = n;
 
     // 100k points more than enough
     x = fvecs_maybe_subsample(d, (size_t*)&n, 100000, x, verbose, 1234);

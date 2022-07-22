@@ -54,6 +54,9 @@ struct ScalarQuantizer : Quantizer {
     /// bits per scalar code
     size_t bits;
 
+    /// if n was used in the training, this is that n value
+    int n_training_value;
+
     /// trained values (including the range)
     std::vector<float> trained;
 
